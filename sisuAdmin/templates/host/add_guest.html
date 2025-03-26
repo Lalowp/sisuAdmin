@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Añadir invitado</title>
+</head>
+<body>
+    <h1>Añadir invitado a {{ event.name }}</h1>
+    <form method='POST'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Añadir</button>
+    </form>
+    <a href="{% url 'event_detail' event_name_id=event.event_name_id %}"><button>Cancelar</button></a>
+</body>
+</html>
