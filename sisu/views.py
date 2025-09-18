@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -9,6 +10,7 @@ from .serializers import GuestSerializer
 
 
 # Create your views here.
+@csrf_protect
 def username_logic(request, event_name_id):
     event = get_object_or_404(Event, event_name_id=event_name_id)
     if request.method == 'POST':
@@ -37,6 +39,7 @@ def delete_guest(request, event_name_id, guest_id):
     guest.delete()
     return redirect('event_detail', event_name_id=event_name_id)
 
+@csrf_protect
 def edit_guest(request, event_name_id, guest_id):
     event = get_object_or_404(Event, event_name_id=event_name_id)
     guest = get_object_or_404(Guest, id=guest_id, event_id=event.id)
@@ -50,6 +53,7 @@ def edit_guest(request, event_name_id, guest_id):
 
     return render(request, 'host/edit_guest.html', {'form': form, 'event': event,'guest': guest})
 
+@csrf_protect
 def add_guest(request, event_name_id):
     event = get_object_or_404(Event, event_name_id=event_name_id)
     if request.method == 'POST':
