@@ -23,8 +23,8 @@
                     <td><a href="{% url 'admin:sisu_guest_add' %}?event={{ event.id }}"><button type="button">Añadir invitado</button></a></td>
                     <td >
                         <form action="" method="POST" enctype="multipart/form-data">
-                            {{ form.as_p }}
                             {% csrf_token %}
+                            {{ form.as_p }}
                             <button style="margin-left: 40%; margin-right: 40%" type="submit">Subir CSV</button>
                         </form>
                     </td>
