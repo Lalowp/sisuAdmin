@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-s31=)0jsf26%1nwchn)kaly^qu!vx=1&inia6zd&1rftbz*1q2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['18.223.134.201', 'localhost']
+ALLOWED_HOSTS = ['18.216.210.41', 'localhost','127.0.0.1', 'sisuinvitaciones.com']
 
 
 # Application definition
@@ -76,7 +76,10 @@ TEMPLATES = [
 ]
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, '/')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 
 WSGI_APPLICATION = 'sisuInvitaciones.wsgi.application'
 
@@ -127,7 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

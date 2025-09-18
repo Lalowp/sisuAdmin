@@ -73,7 +73,7 @@ def event_guests_view(request, event_id):
     return render(request, 'event_guests.html', {'event': event, 'guests': guests, 'form': form})
 
 #Controller - view
-@api_view(['POST'])
+@api_view(['GET'])
 def get_guest_by_event(request, event_name_id):
     event_name = request.query_params.get('eventName')
     guest_name = request.query_params.get('guestName')
@@ -97,7 +97,37 @@ def get_guest_by_event(request, event_name_id):
             'invitations': '',
             'extraGuests':'',
             'assists':'',
-            'response': '404'
+            'response': '404',
+            'message': 'El invitado no se encuentra o está mal escrito el nombre'
+        }
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['PATCH'])
+def update_guest(request, event_name_id):
+    event_name = request.query_params.get('eventName')
+    guest_name = request.query_params.get('guestName')
+
+    if not event_name or not guest_name:
+        return Response({'error:' 'eventName and guestName are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        event = Event.objects.get(event_name_id=event_name)
+    except Event.DoesNotExist:
+        return Response({'error:' 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        guest = Guest.objects.get(event=event, name=guest_name)
+        serializer = GuestSerializer(guest, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+        response_data = serializer.data
+        response_data['response'] = '202'
+
+    except Guest.DoesNotExist:
+        response_data = {
+            'message': 'guest not updated',
+            'response': '200'
         }
 
     return Response(response_data, status=status.HTTP_200_OK)

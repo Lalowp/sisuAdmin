@@ -22,7 +22,8 @@ event_detail,
 delete_guest,
 edit_guest,
 add_guest,
-get_guest_by_event
+get_guest_by_event,
+update_guest
 )
 
 urlpatterns = [
@@ -33,5 +34,6 @@ urlpatterns = [
     path('event/<str:event_name_id>/delete/<int:guest_id>/', delete_guest, name='delete_guest'),
     path('event/<str:event_name_id>/edit/<int:guest_id>/', edit_guest, name='edit_guest'),
     path('event/<str:event_name_id>/save/', add_guest, name='add_guest'),
-    path('api/events/<str:event_name_id>', get_guest_by_event, name='get_guest_by_event')
+    path('api/events/<str:event_name_id>', get_guest_by_event, name='get_guest_by_event'),
+    path('api/events/update/<str:event_name_id>', update_guest, name='update_guest'),
 ]
