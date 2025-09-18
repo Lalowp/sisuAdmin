@@ -55,6 +55,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    '18.216.210.41',
+    'localhost',
+    '127.0.0.1',
+    'http://sisuinvitaciones.com',
+    'http://sisuadmineventos.com',
+]
+
 ROOT_URLCONF = 'sisuInvitaciones.urls'
 
 TEMPLATES = [
