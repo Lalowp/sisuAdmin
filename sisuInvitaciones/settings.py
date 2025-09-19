@@ -59,8 +59,8 @@ CSRF_TRUSTED_ORIGINS = [
     '18.216.210.41',
     'localhost',
     '127.0.0.1',
-    'http://sisuinvitaciones.com',
-    'http://sisuadmineventos.com',
+    'https://sisuinvitaciones.com',
+    'https://sisuadmineventos.com',
 ]
 
 ROOT_URLCONF = 'sisuInvitaciones.urls'
