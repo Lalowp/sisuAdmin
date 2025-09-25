@@ -1,14 +1,14 @@
 import csv
 
 from django.contrib import admin, messages
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import path
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.urls import path
 from django.utils.html import format_html
-from django.views.decorators.csrf import csrf_protect
 
 from .forms import CSVUploadForm
 from .models import Event, Guest, Host
+
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ('name', 'date', 'place', 'event_name_id', 'host_link_invitation','invitation_link','view_guests_link')
@@ -40,7 +40,6 @@ class EventAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
-    @csrf_protect
     def view_guests(self, request, event_id):
         event = get_object_or_404(Event, id=event_id)
         guests = event.guests.all()
