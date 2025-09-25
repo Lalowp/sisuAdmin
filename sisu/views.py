@@ -25,7 +25,8 @@ def username_logic(request, event_name_id):
 def event_detail(request, event_name_id):
     event = get_object_or_404(Event, event_name_id=event_name_id)
     guests = Guest.objects.filter(event=event)
-    return render(request, 'host/event_detail.html', {'event': event, 'guests': guests})
+    confirmed_guests = guests.filter(assists=True).count()
+    return render(request, 'host/event_detail.html', {'event': event, 'guests': guests, 'confirmed': confirmed_guests})
 
 def check_host(username, event):
     host = Host.objects.get(evento=event)
