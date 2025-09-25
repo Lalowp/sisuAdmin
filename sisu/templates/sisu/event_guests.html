@@ -3,28 +3,88 @@
 <head>
     <title>Invitados del evento: {{ event.name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        .button {
+          background-color: #04AA6D; /* Green */
+          border: none;
+          color: white;
+          padding: 15px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 20px;
+          margin: 4px 2px;
+          cursor: pointer;
+        }
+        .button4 {background-color: #e7e7e7; color: black;} /* Gray */
+    </style>
+
 </head>
 
 {% block content %}
+    <button class="button button4"
+            onclick="window.location.href='{% url 'admin:sisu_event_changelist' %}'">
+        Atrás
+    </button>
+    <body>
+    <br/>
+    <br/>
+    <br/>
     <h1>Invitados del evento: {{ event.name }}</h1>
     <h3>ID de evento: {{ event.event_name_id }}</h3>
+    <h3>Link de invitación: <a class="invitation-link" href="{{ event.invitation_link }}" target="_blank">{{ event.name }}</a></h3>
+    <style>
+        invitation-link:link, invitation-link:visited {
+            text-decoration: none;
+            color: blue;
+            cursor: pointer;
+        }
+    </style>
     <h2>{{ download_guests_excel }}</h2>
     <br/>
-    <button style="width: 8%; height: 40px; font-size: 20px; background-color: var(--breadcrumbs-bg);"
-            onclick="window.location.href='{% url 'admin:sisu_event_changelist' %}'">Atrás</button>
-    <body>
+        <div class="simple-csv-guide">
+            <details >
+                <summary style="background: #007bff; color: white; padding: 10px 15px; cursor: pointer; border-radius: 5px;">
+                    📋 Estructura del CSV Requerido
+                </summary>
+                <div style="padding: 15px; background: #000000; border-radius: 0 0 5px 5px;">
+                    <p><strong>Columnas en este orden:</strong></p>
+                    <ol>
+                        <li><code>name</code> - Nombre del invitado (requerido)</li>
+                        <li><code>invitations</code> - Número de invitaciones (requerido)</li>
+                        <li><code>cellphone</code> - Teléfono (opcional)</li>
+                        <li><code>attend</code> - Confirmación: n(No) / y(Sí) (requerido)</li>
+                        <li><code>extraGuests</code> - Invitados adicionales separados por comas (opcional)</li>
+                        <li><code>tablenumber</code> - Número de mesa asignado</li>
+                    </ol>
+
+                    <p><strong>Ejemplo:</strong></p>
+                    <pre style="background: #000000; padding: 10px; border-radius: 3px; overflow-x: auto;">
+                        name,invitations,cellphone,attend,extraGuests,tablenumber
+                        Juan Pérez,2,1234567890,n,"María García, Carlos López",1
+                    </pre>
+
+                    <p><strong>Excel:</strong></p>
+                    <pre style="background: #000000; padding: 10px; border-radius: 3px; overflow-x: auto;">
+                        Crear las columnas con los nombres dado, poner en cada renglón los datos
+                        Guardar como -> .csv
+                    </pre>
+                </div>
+            </details>
+        </div>
         <div>
-            <table border="0" width="75%">
+            <table border="0" width="100%">
                 <tr>
                     <th style="text-align:left">Añadir invitado</th>
                     <th style="text-align:center">Importar invitados</th>
                 </tr>
                 <tr>
                     <td><a href="{% url 'admin:sisu_guest_add' %}?event={{ event.id }}"><button type="button">Añadir invitado</button></a></td>
-                    <td >
+                    <td>
                         <form action="" method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
                             {{ form.as_p }}
+                            {% csrf_token %}
                             <button style="margin-left: 40%; margin-right: 40%" type="submit">Subir CSV</button>
                         </form>
                     </td>
@@ -34,31 +94,189 @@
         <br/>
         <br/>
         <br/>
-        <table border="1" width="75%">
+        <table border="1" width="75%" id="guests-table" class="sortable-table">
+        <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Celular</th>
-                <th>Invitados</th>
-                <th>Asiste</th>
-                <th>Acciones</th>
+                <th data-sort="string" onclick="sortTable(0)" style="background: #000000;">
+                    <div class="th-content">
+                        Nombre
+                        <span class="sort-icons">
+                            <span class="asc-arrow">↑</span>
+                            <span class="desc-arrow">↓</span>
+                        </span>
+                    </div>
+                </th>
+                <th data-sort="string" onclick="sortTable(1)" style="background: #000000;">
+                    <div class="th-content">
+                        Celular
+                        <span class="sort-icons">
+                            <span class="asc-arrow">↑</span>
+                            <span class="desc-arrow">↓</span>
+                        </span>
+                    </div>
+                </th>
+                <th data-sort="number" onclick="sortTable(2)" style="background: #000000;">
+                    <div class="th-content">
+                        Invitados
+                        <span class="sort-icons">
+                            <span class="asc-arrow">↑</span>
+                            <span class="desc-arrow">↓</span>
+                        </span>
+                    </div>
+                </th>
+                <th data-sort="string" onclick="sortTable(3)" style="background: #000000;">
+                    <div class="th-content">
+                        Invitados Extras
+                        <span class="sort-icons">
+                            <span class="asc-arrow">↑</span>
+                            <span class="desc-arrow">↓</span>
+                        </span>
+                    </div>
+                </th>
+                <th data-sort="number" onclick="sortTable(4)" style="background: #000000;">
+                    <div class="th-content">
+                        Número de mesa
+                        <span class="sort-icons">
+                            <span class="asc-arrow">↑</span>
+                            <span class="desc-arrow">↓</span>
+                        </span>
+                    </div>
+                </th>
+                <th data-sort="boolean" onclick="sortTable(5)" style="background: #000000;">
+                    <div class="th-content">
+                        Asiste
+                        <span class="sort-icons">
+                            <span class="asc-arrow">↑</span>
+                            <span class="desc-arrow">↓</span>
+                        </span>
+                    </div>
+                </th>
+                <th style="background: #000000;">Acciones</th>
             </tr>
+        </thead>
+        <tbody>
             {% for guest in guests %}
             <tr>
                 <td>{{ guest.name }}</td>
                 <td>{{ guest.cellphone }}</td>
-                <td>{{ guest.invitations }}</td>
-                <td>
-                    {% if guest.assists == 1 %}
+                <td data-sort-value="{{ guest.invitations }}">{{ guest.invitations }}</td>
+                <td>{{ guest.extraGuests }}</td>
+                <td data-sort-value="{{ guest.table_number|default:0 }}">{{ guest.table_number }}</td>
+                <td data-sort-value="{{ guest.assists|yesno:'1,0' }}">
+                    {% if guest.assists %}
                         <img src="/static/admin/img/icon-yes.svg" alt="True">
                     {% else %}
                         <img src="/static/admin/img/icon-no.svg" alt="False">
                     {% endif %}
                 </td>
-                </td>
                 <td><a href="{% url 'admin:sisu_guest_change' guest.id %}">Editar</a></td>
             </tr>
             {% endfor %}
-        </table>
+        </tbody>
+    </table>
+
+    <style>
+        .sortable-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .sortable-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        .sortable-table th:hover {
+            background-color: #e9ecef;
+        }
+        .sortable-table td {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .th-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000000;
+        }
+        .sort-icons {
+            display: flex;
+            flex-direction: column;
+            font-size: 10px;
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        .asc-arrow, .desc-arrow {
+            line-height: 0.8;
+        }
+        th.asc .asc-arrow,
+        th.desc .desc-arrow {
+            opacity: 1;
+            color: #007bff;
+            font-weight: bold;
+        }
+        th.sorted {
+            background-color: #e3f2fd;
+        }
+    </style>
+
+    <script>
+        let currentSort = { column: -1, ascending: true };
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById('guests-table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const headers = table.querySelectorAll('th');
+            const sortType = headers[columnIndex].getAttribute('data-sort');
+
+            // Reset all headers
+            headers.forEach(header => {
+                header.classList.remove('asc', 'desc', 'sorted');
+            });
+
+            // Set new sort state
+            if (currentSort.column === columnIndex) {
+                currentSort.ascending = !currentSort.ascending;
+            } else {
+                currentSort.column = columnIndex;
+                currentSort.ascending = true;
+            }
+
+            // Apply styles to current header
+            headers[columnIndex].classList.add(currentSort.ascending ? 'asc' : 'desc', 'sorted');
+
+            // Sort rows
+            rows.sort((a, b) => {
+                const aCell = a.cells[columnIndex];
+                const bCell = b.cells[columnIndex];
+
+                let aValue = aCell.getAttribute('data-sort-value') || aCell.textContent;
+                let bValue = bCell.getAttribute('data-sort-value') || bCell.textContent;
+
+                // Convert based on sort type
+                if (sortType === 'number') {
+                    aValue = parseFloat(aValue) || 0;
+                    bValue = parseFloat(bValue) || 0;
+                } else if (sortType === 'boolean') {
+                    aValue = aValue === '1';
+                    bValue = bValue === '1';
+                } else {
+                    aValue = aValue.toString().toLowerCase();
+                    bValue = bValue.toString().toLowerCase();
+                }
+
+                if (aValue < bValue) return currentSort.ascending ? -1 : 1;
+                if (aValue > bValue) return currentSort.ascending ? 1 : -1;
+                return 0;
+            });
+
+            // Reinsert sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    </script>
     </body>
 {% endblock %}
 </html>

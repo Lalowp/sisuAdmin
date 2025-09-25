@@ -1,74 +1,545 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>List de invitados - {{ event.name }}</title>
-    Pencil icons created by riajulislam - Flaticon
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de invitados - {{ event.name }}</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/hostPage.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .nav-brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .event-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .event-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .event-details {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .event-detail {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .event-detail i {
+            font-size: 1.2rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        .guests-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .guests-table th {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            border: none;
+        }
+
+        .guests-table th:hover {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        .guests-table th.sort-asc::after {
+            content: " ↑";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .guests-table th.sort-desc::after {
+            content: " ↓";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .guests-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .guests-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .guests-table tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        .guests-table tr:nth-child(even):hover {
+            background-color: #f0f0f0;
+        }
+
+        .action-cell {
+            text-align: center;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .edit-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #2980b9;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .action-btn img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .status-yes {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .status-no {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        /* Stats Summary */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            display: block;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0;
+                margin-top: 10px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 12px;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+
+            #nav-check:checked ~ .nav-links {
+                display: flex;
+            }
+
+            .event-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .event-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .container {
+                padding: 0 10px;
+                margin: 15px auto;
+            }
+
+            .table-container {
+                padding: 10px;
+            }
+
+            .guests-table th,
+            .guests-table td {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+
+            .action-btn {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .event-header {
+                padding: 20px;
+            }
+
+            .stats-summary {
+                grid-template-columns: 1fr;
+                margin: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
 </head>
 <body>
+    <!-- Navigation -->
     <div class="nav">
-        <input type="checkbox" id="nav-check">
-        <div class="nav-header"></div>
-        <div class="nav-btn">
-            <label for="nav-check">
+        <div class="nav-container">
+            <div class="nav-brand">Gestión de Invitados</div>
                 <span></span>
                 <span></span>
                 <span></span>
             </label>
-        </div>
-        <div class="nav-links">
-            <a href="{% url 'add_guest' event.event_name_id %}">Añadir</a>
-            <a href="{% url 'username_login' event.event_name_id %}">Salir</a>
-        </div>
-    </div>
-    <h1>{{ event.name }}</h1>
-    <div class="row">
-        <div class="column-left">
-            <p>{{ event.place }}</p>
-        </div>
-        <div class="column-right">
-            <p>{{ event.date }}</p>
+            <div class="nav-links">
+                <a href="{% url 'add_guest' event.event_name_id %}">➕ Añadir Invitado</a>
+                <a href="{% url 'username_login' event.event_name_id %}">🚪 Salir</a>
+            </div>
         </div>
     </div>
-    <table border="1" width="75%">
-            <tr>
-                <th>Nombre</th>
-                <th>Celular</th>
-                <th>Invitados</th>
-                <th>Asiste</th>
-                <th>Invitados Extras</th>
-                <th>No de mesa</th>
-                <th>Editar</th>
-                <th>Eliminar</th>
-            </tr>
-            {% for guest in guests %}
-            <tr>
-                <td>{{ guest.name }}</td>
-                <td>{{ guest.cellphone }}</td>
-                <td>{{ guest.invitations }}</td>
-                <td>
-                    {% if guest.assists == 1 %}
-                        Sí asiste
-                    {% else %}
-                        No asiste
-                    {% endif %}
-                </td>
-                <td>{{ guest.extraGuests }}</td>
-                <td>{{ guest.table_number }}</td>
-                <td>
-                    <a href="{% url 'edit_guest' event_name_id=event.event_name_id guest_id=guest.id %}">
-                        <img src="/static/images/editar.png" style="width: 30px; margin-left: 15px;" alt="Editar invitado"/>
-                    </a>
-                </td>
-                <td>
-                    <a href="{% url 'delete_guest' event_name_id=event.event_name_id guest_id=guest.id %}">
-                        <img src="/static/admin/img/icon-no.svg" style="width: 30px; margin-left: 15px;" alt="Borrar invitado"/>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-    </table>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="card">
+            <!-- Event Header -->
+            <div class="event-header">
+                <h1>{{ event.name }}</h1>
+                <div class="event-details">
+                    <div class="event-detail">
+                        <i>📍</i>
+                        <span>{{ event.place }}</span>
+                    </div>
+                    <div class="event-detail">
+                        <i>📅</i>
+                        <span>{{ event.date }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <span class="stat-number">{{ guests|length }}</span>
+                    <span class="stat-label">Total Invitados</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{ confirmed }}</span>
+                    <span class="stat-label">Confirmados</span>
+                </div>
+            </div>
+
+            <!-- Guests Table -->
+            <div class="table-container">
+                <table class="guests-table" id="sortable-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Nombre</th>
+                            <th onclick="sortTable(1)">Celular</th>
+                            <th onclick="sortTable(2)">Invitados</th>
+                            <th onclick="sortTable(3)">Asiste</th>
+                            <th onclick="sortTable(4)">Invitados Extras</th>
+                            <th onclick="sortTable(5)">No de mesa</th>
+                            <th>Editar</th>
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for guest in guests %}
+                        <tr>
+                            <td>{{ guest.name }}</td>
+                            <td>{{ guest.cellphone }}</td>
+                            <td>{{ guest.invitations }}</td>
+                            <td>
+                                {% if guest.assists %}
+                                    <span class="status-yes">Sí asiste</span>
+                                {% else %}
+                                    <span class="status-no">No asiste</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ guest.extraGuests }}</td>
+                            <td>{{ guest.table_number }}</td>
+                            <td class="action-cell">
+                                <a href="{% url 'edit_guest' event_name_id=event.event_name_id guest_id=guest.id %}"
+                                   class="action-btn edit-btn"
+                                   title="Editar invitado">
+                                    <img src="/static/images/editar.png" alt="Editar"/>
+                                </a>
+                            </td>
+                            <td class="action-cell">
+                                <a href="{% url 'delete_guest' event_name_id=event.event_name_id guest_id=guest.id %}"
+                                   class="action-btn delete-btn"
+                                   title="Eliminar invitado"
+                                   onclick="return confirm('¿Estás seguro de que quieres eliminar a {{ guest.name }}?')">
+                                    <img src="/static/admin/img/icon-no.svg" alt="Eliminar"/>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Table Sorting Functionality
+        let currentSortColumn = -1;
+        let isAscending = true;
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById('sortable-table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const headers = table.querySelectorAll('th');
+
+            // Remove previous sorting classes
+            headers.forEach(header => {
+                header.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            // Toggle sort direction if clicking the same column
+            if (currentSortColumn === columnIndex) {
+                isAscending = !isAscending;
+            } else {
+                isAscending = true;
+                currentSortColumn = columnIndex;
+            }
+
+            // Add sorting class to current column
+            headers[columnIndex].classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue, bValue;
+                const aCell = a.cells[columnIndex];
+                const bCell = b.cells[columnIndex];
+
+                // Get cell values for sorting
+                if (columnIndex === 2 || columnIndex === 5) { // Numeric columns
+                    aValue = parseFloat(aCell.textContent) || 0;
+                    bValue = parseFloat(bCell.textContent) || 0;
+                } else if (columnIndex === 3) { // Asiste column (boolean)
+                    aValue = aCell.querySelector('.status-yes') ? 1 : 0;
+                    bValue = bCell.querySelector('.status-yes') ? 1 : 0;
+                } else { // Text columns
+                    aValue = (aCell.textContent || '').toLowerCase();
+                    bValue = (bCell.textContent || '').toLowerCase();
+                }
+
+                // Compare values
+                if (aValue < bValue) return isAscending ? -1 : 1;
+                if (aValue > bValue) return isAscending ? 1 : -1;
+                return 0;
+            });
+
+            // Reappend sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function countMatchingRows(tableId, columnIndex, searchValue) {
+              let count = 0;
+              // Select all rows within the specified table's tbody (excluding header rows)
+              $(`#${tableId} tbody tr`).each(function() {
+                // Get the text content of the cell at the specified column index within the current row
+                const cellValue = $(this).find('td').eq(columnIndex).text().trim();
+
+                // Check if the cell value matches the search value
+                if (cellValue === searchValue) {
+                  count++;
+                }
+              });
+              return count;
+            }
+
+        // Mobile Navigation Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            navToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.nav-container')) {
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
