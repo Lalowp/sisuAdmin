@@ -8,7 +8,7 @@
 </head>
 <body class="body-container">
     <div class="login-container">
-        <h1>Login para ver invitados del evento {{ event.name}}</h1>
+        <h1>{{ event.name}}</h1>
         <form method='POST'>
             {% csrf_token %}
             {% if error %}
