@@ -66,7 +66,7 @@ class EventAdmin(admin.ModelAdmin):
                             invitations_str = row_lower.get('invitations', '0').strip()
                             cellphone = row_lower.get('cellphone', '').strip()
                             attend_str = row_lower.get('attend', 'false').strip().lower()
-                            extra_guests = row_lower.get('extraguests', '').strip()
+                            extra_guests = row_lower.get('extraguests', '').strip() or ''
                             table_number_str = row_lower.get('tablenumber', '0').strip()
 
                             # Validate required fields
@@ -135,7 +135,7 @@ class EventAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "sisu/event_guests.html", context)
 
 def str_to_bool(value):
-    return value.lower() in ['true', '1', 'yes', 'si', 'y']
+    return value.lower() in ['true', '1', 'yes', 'si', 'y', 's']
 
 def str_to_integer(value):
     return int(value)
