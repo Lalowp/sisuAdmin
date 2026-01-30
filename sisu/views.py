@@ -36,7 +36,8 @@ def check_host(username, event):
         return False
 
 def delete_guest(request, event_name_id, guest_id):
-    guest = get_object_or_404(Guest, id=guest_id, event_name_id=event_name_id)
+    event = get_object_or_404(Event, event_name_id=event_name_id)
+    guest = get_object_or_404(Guest, id=guest_id, event_id=event.id)
     guest.delete()
     return redirect('event_detail', event_name_id=event_name_id)
 
