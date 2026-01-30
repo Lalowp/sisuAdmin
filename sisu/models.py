@@ -39,6 +39,7 @@ class Guest(models.Model):
     extraGuests = models.CharField(max_length=300, default='', blank=True)
     event = models.ForeignKey(Event, related_name='guests', on_delete=models.CASCADE, default='')
     table_number = models.IntegerField(default=0)
+    has_confirmed = models.BooleanField(default=False)
     creation_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
