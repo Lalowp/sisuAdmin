@@ -151,6 +151,15 @@
                         </span>
                     </div>
                 </th>
+                <th data-sort="boolean" onclick="sortTable(5)" style="background: #000000;">
+                    <div class="th-content">
+                        Ya confirmó
+                        <span class="sort-icons">
+                            <span class="asc-arrow">↑</span>
+                            <span class="desc-arrow">↓</span>
+                        </span>
+                    </div>
+                </th>
                 <th style="background: #000000;">Acciones</th>
             </tr>
         </thead>
@@ -164,6 +173,13 @@
                 <td data-sort-value="{{ guest.table_number|default:0 }}">{{ guest.table_number }}</td>
                 <td data-sort-value="{{ guest.assists|yesno:'1,0' }}">
                     {% if guest.assists %}
+                        <img src="/static/admin/img/icon-yes.svg" alt="True">
+                    {% else %}
+                        <img src="/static/admin/img/icon-no.svg" alt="False">
+                    {% endif %}
+                </td>
+                <td data-sort-value="{{ guest.has_confirmed|yesno:'1,0' }}">
+                    {% if guest.has_confirmed %}
                         <img src="/static/admin/img/icon-yes.svg" alt="True">
                     {% else %}
                         <img src="/static/admin/img/icon-no.svg" alt="False">

@@ -410,6 +410,7 @@
                             <th onclick="sortTable(1)">Celular</th>
                             <th onclick="sortTable(2)">Invitados</th>
                             <th onclick="sortTable(3)">Asiste</th>
+                            <th onclick="sortTable(3)">Ya confirmó</th>
                             <th onclick="sortTable(4)">Invitados Extras</th>
                             <th onclick="sortTable(5)">No de mesa</th>
                             <th>Editar</th>
@@ -427,6 +428,13 @@
                                     <span class="status-yes">Sí asiste</span>
                                 {% else %}
                                     <span class="status-no">No asiste</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if guest.has_confirmed %}
+                                    <span class="status-yes">Ya dio click</span>
+                                {% else %}
+                                    <span class="status-no">No ha dado click</span>
                                 {% endif %}
                             </td>
                             <td>{{ guest.extraGuests }}</td>
